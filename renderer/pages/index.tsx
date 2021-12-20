@@ -28,7 +28,7 @@ const IndexPage = () => {
     global.ipcRenderer.send('OPEN_DEV_TOOLS')
   }
   return (
-    <Layout title="Home | Next.js + TypeScript + Electron Example">
+    <Layout title="Dashboard | Expenses App">
       <Button onClick={onOpenDevTools} variant="contained">Open DevTools</Button>
       <p>
         <Link href="/about" passHref>
