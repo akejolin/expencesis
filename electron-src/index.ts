@@ -26,8 +26,8 @@ app.on('ready', async () => {
 
   // Create app window
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1280,
+    height: 800,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: false,
@@ -37,7 +37,7 @@ app.on('ready', async () => {
 
   // Open devtools
   if (isDev) {
-    mainWindow.webContents.openDevTools()
+    //mainWindow.webContents.openDevTools()
   }
 
   const url = isDev
@@ -61,10 +61,12 @@ ipcMain.on('message', (event: IpcMainEvent, message: any) => {
 })
 
 
-// Open devtools
-ipcMain.on('OPEN_DEV_TOOLS', () => {
+// Toggle devtools
+let isDevtoolsOpen = false
+ipcMain.on('TOOGLE_DEV_TOOLS', () => {
   if (isDev) {
-    mainWindow.webContents.openDevTools()
+    !isDevtoolsOpen ? mainWindow.webContents.openDevTools() : mainWindow.webContents.closeDevTools()
+    isDevtoolsOpen = isDevtoolsOpen ? false : true
   }
 })
 

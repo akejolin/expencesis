@@ -2,8 +2,7 @@ import Link from 'next/link'
 import Layout from '../components/Layout'
 import FlexView from '../components/flexView'
 import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import useMediaQuery from '@mui/material/useMediaQuery';
+
 
 
 

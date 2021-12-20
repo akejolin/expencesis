@@ -3,6 +3,8 @@ import Link from 'next/link'
 import MUILink from '@mui/material/Link';
 import Layout from '../components/Layout'
 import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import FlexView from '../components/flexView'
 
 const IndexPage = () => {
   const [gasData, _gasData] = useState([])
@@ -28,14 +30,27 @@ const IndexPage = () => {
     global.ipcRenderer.send('OPEN_DEV_TOOLS')
   }
   return (
-    <Layout title="Dashboard | Expenses App">
-      <Button onClick={onOpenDevTools} variant="contained">Open DevTools</Button>
-      <p>
-        <Link href="/about" passHref>
-          <MUILink>About</MUILink>
-        </Link>
-      </p>
-    </Layout>
+    <Layout title="Settings | Expenses App">
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <FlexView style={{background:'green'}}>
+          <h1 style={{marginBottom: 5, marginTop: 5,}}>
+              Settings
+          </h1>
+          </FlexView>
+        </Grid>
+        <Grid item xs={12} sm={12} md={6}>
+          <FlexView style={{background:'red'}}>
+            col1
+          </FlexView>
+        </Grid>
+        <Grid item xs={12} sm={12} md={6}>
+          <FlexView style={{background:'blue'}}>
+            col2
+          </FlexView>
+        </Grid>
+      </Grid>
+  </Layout>
   )
 }
 

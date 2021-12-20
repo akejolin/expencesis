@@ -17,8 +17,8 @@ import Link from 'next/link'
 
 
 export default function IconMenu() {
-  const onOpenDevTools = () => {
-    global.ipcRenderer.send('OPEN_DEV_TOOLS')
+  const onToggleDevTools = () => {
+    global.ipcRenderer.send('TOOGLE_DEV_TOOLS')
   }
   return (
       <MenuList>
@@ -44,7 +44,7 @@ export default function IconMenu() {
         </MenuItem>
         <Divider />
 
-          <MenuItem onClick={onOpenDevTools}>
+          <MenuItem onClick={onToggleDevTools}>
           <ListItemIcon>
               <Cloud fontSize="small" />
           </ListItemIcon>
