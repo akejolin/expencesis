@@ -10,6 +10,9 @@ import prepareNext from 'electron-next'
 import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 
 
+import readFileRowsInArray from './utils/file.read.array'
+
+
 let mainWindow:BrowserWindow
 
 // Prepare the renderer once the app is ready
@@ -63,4 +66,26 @@ ipcMain.on('OPEN_DEV_TOOLS', () => {
   if (isDev) {
     mainWindow.webContents.openDevTools()
   }
+})
+
+
+ipcMain.on('REQUEST_DATA', async (event: IpcMainEvent, dataSource:string) => {
+
+  const filePath = `/Users/jonaslinde/data/expenses/${dataSource.toLowerCase().replace(/_/g, '-')}.txt`
+
+  try {
+    let rows:Array<string> = await readFileRowsInArray(`${filePath}`)
+    let result:Array<Array<number>> = rows.map((row:String) => {
+      let _arr = row.split(';').filter(r => r !== '')
+      let arr = _arr.map(str => Number(str))
+      return arr
+    }).filter(r => r.length > 0)
+
+    event.sender.send(`DATA_RESPONSE_${dataSource}`, result)
+
+  } catch(error) {
+    throw new Error(`error reading db file: ${filePath}, ${error}`)
+  }
+
+
 })

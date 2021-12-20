@@ -3,7 +3,7 @@ import type { AppProps } from 'next/app';
 import Head from 'next/head'
 import { store } from '../redux/store';
 
-//import './style.css'
+import './style.css'
 
 function App({
   Component, pageProps,
