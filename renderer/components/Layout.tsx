@@ -11,6 +11,7 @@ import SideMenu from './sideMenu'
 import FlexView from '../components/flexView'
 
 
+
 type Props = {
   children: ReactNode
   title?: string
@@ -27,14 +28,7 @@ const Layout = ({ children, title = 'Expenses App' }: Props) => {
             //default: 'rgb(0, 30, 60)',
             default: 'rgb(10, 25, 41)',
           },
-          primary: {
 
-            main: 'rgb(10, 25, 41)',
-          },
-          secondary: {
-
-            main: 'rgb(10, 25, 41)',
-          },
           //divider: 'rgb(0, 60, 90)',
         },
       }),
@@ -54,14 +48,14 @@ const Layout = ({ children, title = 'Expenses App' }: Props) => {
         <title>{title}</title>
         <meta charSet="utf-8" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        <link rel="stylesheet" type="text/css" href="/css/font-awesome.all.min.css" />
       </Head>
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <FlexView style={{background:'purple'}}>
-                Logo
-          </FlexView>
+          <FlexView style={{height:20}}></FlexView>
         </Grid>
         <Grid item xs={12} sm={3} md={2} lg={2} xl={2}>
+          <div style={{width: '100%', textAlign:'center', opacity:0.8}}><img src="/images/logo.png" width="55%"/></div>
           <SideMenu />
         </Grid>
         <PaddingRightGrid item xs={12} sm={9} md={10} lg={10} xl={10}>

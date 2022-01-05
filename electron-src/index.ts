@@ -71,23 +71,23 @@ ipcMain.on('TOOGLE_DEV_TOOLS', () => {
 })
 
 
+const dataStoragePath = '/Users/jonaslinde/data/expenses/'
+
 ipcMain.on('REQUEST_DATA', async (event: IpcMainEvent, dataSource:string) => {
 
-  const filePath = `/Users/jonaslinde/data/expenses/${dataSource.toLowerCase().replace(/_/g, '-')}.txt`
-
+  const filePath = `${dataStoragePath}${dataSource.toLowerCase().replace(/_/g, '-')}.txt`
   try {
     let rows:Array<string> = await readFileRowsInArray(`${filePath}`)
-    let result:Array<Array<number>> = rows.map((row:String) => {
+    let result:Array<Array<number | string>> = rows.map((row:String) => {
       let _arr = row.split(';').filter(r => r !== '')
-      let arr = _arr.map(str => Number(str))
+      let arr = _arr.map(str => Number(str) ? Number(str) : str)
       return arr
     }).filter(r => r.length > 0)
 
+    //console.log('dataSource: ', `DATA_RESPONSE_${dataSource}`, result)
     event.sender.send(`DATA_RESPONSE_${dataSource}`, result)
 
   } catch(error) {
     throw new Error(`error reading db file: ${filePath}, ${error}`)
   }
-
-
 })
