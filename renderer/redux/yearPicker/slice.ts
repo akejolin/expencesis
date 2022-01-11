@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import type { RootState } from '../store'
-import { getCurrentYear } from '../../utils/getCurrentYear'
+import { getCurrentYear } from '../../utils/dateHelpers'
 import { setCookie, getCookie } from '../../utils/cookie' 
 
 // Define a type for the slice state

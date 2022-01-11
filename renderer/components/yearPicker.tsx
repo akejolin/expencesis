@@ -2,7 +2,7 @@ import react, {useEffect} from 'react'
 
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { set } from "../redux/yearPicker/slice";
-import { getCurrentYear } from '../utils/getCurrentYear'
+import { getCurrentYear } from '../utils/dateHelpers'
 
 
 const YearPicker = () => {

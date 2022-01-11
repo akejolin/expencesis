@@ -79,7 +79,7 @@ export const Charts = (props: Props) => {
 const RenderCustomBarLabel = (props) => {
 
   const { offset, x, y, width, height, value, unit='kr' } = props
-  console.log('props: ', props)
+
   return (
   <g>
     <defs>

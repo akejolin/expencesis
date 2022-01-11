@@ -44,18 +44,18 @@ export const Charts = (props: Props) => {
   const data = [
     {
     name: `${props.currentYear}`,
-    d1: pickAndSumData(selectYearData(props.stack, props.currentYear), 2),
+    d1: pickAndSumData(selectYearData(props.stack, props.currentYear), 'c'),
  
   },
   {
     name: `${props.currentYear-1}`,
 
-    d2: pickAndSumData(selectYearData(props.stack, props.currentYear-1), 2),
+    d2: pickAndSumData(selectYearData(props.stack, props.currentYear-1), 'c'),
 
   },
   {
     name: `${props.currentYear-2}`,
-    d3: pickAndSumData(selectYearData(props.stack, props.currentYear-2), 2),
+    d3: pickAndSumData(selectYearData(props.stack, props.currentYear-2), 'c'),
   }
 ]
 

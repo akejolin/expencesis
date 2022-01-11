@@ -5,13 +5,15 @@ import {
 } from '@reduxjs/toolkit';
 import { useSelector as _useSelector } from "react-redux";
 
-import {reducer as example} from './example/reducer';
 import {reducer as yearPicker} from './yearPicker/slice';
+import {reducer as calcPicker} from './calcPicker/slice';
+import {reducer as calcPickerUsage} from './calcPickerUsage/slice';
 
 export const store = configureStore({
   reducer: {
-    example,
     yearPicker,
+    calcPicker,
+    calcPickerUsage,
 // This is where we add reducers.
 // Since we don't have any yet, leave this empty
   },

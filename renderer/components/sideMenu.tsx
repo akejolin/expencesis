@@ -17,11 +17,12 @@ import Cloud from '@mui/icons-material/Cloud';
 
 import MUILink from '@mui/material/Link';
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 
 
 export default function IconMenu() {
-
+  const router = useRouter()
   const [menudata, _menudata] = useState([])
 
   const onToggleDevTools = () => {
@@ -40,6 +41,29 @@ export default function IconMenu() {
 
   }, [])
 
+
+  const SelectedMenuItem = styled(MenuItem)(({ theme }) => ({
+    color: 'rgb(10, 25, 41)',
+    background: 'white',
+    '&:hover': {
+      background: "rgba(255, 255, 255,.7)",
+      //color: 'white',
+    'i': {
+      //color: 'white',
+    }
+   },
+   'i': {
+    color: 'rgb(10, 25, 41)',
+    }
+  })) 
+
+  const UnselectedMenuItem = styled(MenuItem)(({ theme }) => ({
+    color: 'white',
+  }))
+
+  const SelectMenuItem = (props) => {
+    return router.asPath === props.href ? <SelectedMenuItem {...props} >{props.children}</SelectedMenuItem> : <UnselectedMenuItem {...props}>{props.children}</UnselectedMenuItem>
+  } 
   
   return (
       <MenuList>
@@ -47,43 +71,31 @@ export default function IconMenu() {
             menudata.map((item,i) => {
               return(
               <Link key={`key-${item[0]}-${i}`} href={item[0]}>
-              <MenuItem>
+              <SelectMenuItem href={item[0]}>
                 {item[3] && (
                   <ListItemIcon>
-                    <WhiteText><i className={`${item[2]} ${item[3]}`} /></WhiteText>
+                    <i className={`${item[2]} ${item[3]}`} />
                   </ListItemIcon>
                 )}
                 <ListItemText>{item[1]}</ListItemText>
-              </MenuItem>
+              </SelectMenuItem>
             </Link>
             )})
           }
-        <MenuItem>
-          <ListItemIcon>
-            <ContentCopy fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Projects</ListItemText>
-        </MenuItem>
-        <MenuItem>
-          <ListItemIcon>
-            <ContentPaste fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Insert Data</ListItemText>
-        </MenuItem>
         <Divider />
         <MenuItem onClick={onToggleDevTools}>
           <ListItemIcon>
-            <Cloud fontSize="small" />
+            <i className={`fas fa-cloud`} />
           </ListItemIcon>
           <ListItemText>DevTools</ListItemText>
         </MenuItem>
         <Link href="/settings" passHref>
-          <MenuItem>
+          <SelectMenuItem>
             <ListItemIcon>
-              <Cloud fontSize="small" />
+              <i className={`fas fa-cloud`} />
             </ListItemIcon>
             <ListItemText>Settings</ListItemText>
-          </MenuItem>
+          </SelectMenuItem>
         </Link>
       </MenuList>
   );

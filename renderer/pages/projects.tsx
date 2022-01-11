@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import MUILink from '@mui/material/Link';
 import Layout from '../components/Layout'
-import TotalCard, { T_diffOutput } from '../components/TotalCard'
+import TotalCard from '../components/TotalCard'
 import TotalTotalCard from '../components/TotalTotalCard'
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -13,7 +13,7 @@ import FlexView from '../components/styledFlexView'
 import {ChartCard, ChartCardTitle} from '../components/charts/cardDesign'
 
 import MonthlyLineCharts from '../components/charts/monthlyLineCharts'
-import { dataCostUnit, dataUsageUnit, I_dataSets, T_CostsDataSet, T_month } from '../dataTypes/costs'
+import type { T_CostsDataSet, T_month } from '../dataTypes/costs'
 import PieCharts from '../components/charts/pieCharts'
 import type {T_pieData} from '../components/charts/pieCharts'
 
@@ -44,14 +44,14 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { add as calcPickerAdd, remove as calcPickerRemove} from "../redux/calcPicker/slice";
+
 
 const IndexPage = () => {
 
  
   const currentYear = useAppSelector((state) => state.yearPicker.value);
   const calcPicker = useAppSelector((state) => state.calcPicker.value);
-  const dispatch = useAppDispatch()
+
 
   const [dataGas, _dataGas] = useState([])
   const [dataElst, _dataElst] = useState([])
@@ -247,238 +247,6 @@ const IndexPage = () => {
   const arrayYearA = generateTotalArray(currentYear)
   const arrayYearB = generateTotalArray(currentYear-1)
    
-
-
-
-
-
-  const calcPickerOnClick = ({id}) => {
-    const isSelected:boolean = calcPicker.find(item => item === id)?true:false;
-    dispatch(isSelected?calcPickerRemove(id):calcPickerAdd(id))
-  }
-
-
-  const generateAllDataSets = (year:Number, dataSets:I_dataSets, _calcPicker) => {
-    const loop:T_month[] = [1,2,3,4,5,6,7,8,9,10,11,12]
-    const isLatestYear = year === getCurrentYear
-    const currentMonth = getMonth()
-
-    
-    const yearPerMonthArrays = loop.map((m) => {
-
-      const outputA = gatherData(dataSet, _calcPicker, year, m)
-      let outputB = gatherData(dataSet, _calcPicker, Number(year)-1, m)
-
-      outputB = outputB.map((item,i) => {
-
-        let outputSum = item
-        const compareWithA = outputA.find(f => f.dataSetKey === item.dataSetKey)
-
-        if (isLatestYear && !compareWithA) {
-          outputSum.data = []
-        } else if ( isLatestYear && compareWithA <= 0) {
-          outputSum.data = []
-        } else if (isLatestYear && m > currentMonth) {
-          outputSum.data = []
-        }
-        return item
-      })
-      return {
-        a: outputA,
-        b: outputB,
-      }
-    })
-    
-    return {a: yearPerMonthArrays.map(item => item.a), b:yearPerMonthArrays.map(item => item.b)}
-  
-}
-
-
-  const allDataSetsNoCalcFilter = generateAllDataSets(currentYear, dataSet, [
-    'gas',
-    'elst',
-    'eldy',
-    'waste',
-    'water',
-    'broadband',
-    'security',
-    'maintenance',
-    'cleaning',
-    'loan',
-    'insurance',
-    'gardenWaste',
-    'firewood',
-  ])
-
-
-
-  const pick = (stack, dataSetKey, AorB) => {
-    return stack[AorB].map(it => 
-      it.filter(item => item.dataSetKey === dataSetKey).map(item => item.data && item.data.length > 0 ? item.data : [0,0,0,0])
-    ).map(item => item[0] || [0,0,0,0])
-  }
-
-  const calcDiff = (a, b): T_diffOutput => {
-    const round = (num) => Math.round(num * 10) / 10
-    const inProcent = (part, a, b) => b !== 0 ? round((Number(part) / Number(b)) * 100) : a === 0 ? 0 : 100 
-    
-    let diff = a - b
-    const procent = inProcent(diff,a, b)
-    const increased = procent > 0 ? true : false
-
-    return {
-      diff,
-      procent,
-      increased,
-      a,
-      b
-    }
-  }
-
-  const target = 'c'
-  const totalCardarray: {
-    id:string,
-    icon: any,
-    iconColor:string,
-    primaryText:string,
-    secondaryText:string,
-    subberText:string,
-    diff: T_diffOutput
-  } = [
-    {
-      id: 'gas',
-      icon: faBurn,
-      iconColor: 'warning',
-      primaryText: 'Gas',
-      secondaryText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'gas', 'a'),target),target)}kr`,
-      subberText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'gas', 'b'),target), target)}kr`,
-      diff: calcDiff(pickAndSumData(pick(allDataSetsNoCalcFilter, 'gas', 'a'),target), pickAndSumData(pick(allDataSetsNoCalcFilter, 'gas', 'b'),target))
-    },
-    {
-      id: 'elst',
-      icon: faBolt,
-      iconColor: 'secondary',
-      primaryText: 'El static',
-      secondaryText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'elst', 'a'),target), target)}kr`,
-      subberText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'elst', 'b'),target), target)}kr`,
-      diff: calcDiff(pickAndSumData(pick(allDataSetsNoCalcFilter, 'elst', 'a'),target), pickAndSumData(pick(allDataSetsNoCalcFilter, 'elst', 'b'),target))
-    },
-    {
-      id: 'eldy',
-      icon: faBolt,
-      iconColor: 'secondary',
-      primaryText: 'El variable',
-      secondaryText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'eldy', 'a'),target), target)}kr`,
-      subberText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'eldy', 'b'),target), target)}kr`,
-      diff: calcDiff(pickAndSumData(pick(allDataSetsNoCalcFilter, 'eldy', 'a'),target), pickAndSumData(pick(allDataSetsNoCalcFilter, 'eldy', 'b'),target))
-    },
-    {
-      id: 'water',
-      icon: faTint,
-      iconColor: 'info',
-      primaryText: 'Water',
-      secondaryText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'water', 'a'),target), target)}kr`,
-      subberText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'water', 'b'),target), target)}kr`,
-      diff: calcDiff(pickAndSumData(pick(allDataSetsNoCalcFilter, 'water', 'a'),target), pickAndSumData(pick(allDataSetsNoCalcFilter, 'water', 'b'),target))
-    },
-    {
-      id: 'waste',
-      icon: faTrashAlt,
-      iconColor: 'info',
-      primaryText: 'House Waste',
-      secondaryText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'waste', 'a'),target), target)}kr`,
-      subberText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'waste', 'b'),target), target)}kr`,
-      diff: calcDiff(pickAndSumData(pick(allDataSetsNoCalcFilter, 'waste', 'a'),target), pickAndSumData(pick(allDataSetsNoCalcFilter, 'waste', 'b'),target))
-    },
-    {
-      id: 'gardenWaste',
-      icon: faTrashAlt,
-      iconColor: 'info',
-      primaryText: 'Garden waste',
-      secondaryText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'gardenWaste', 'a'),target), target)}kr`,
-      subberText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'gardenWaste', 'b'),target), target)}kr`,
-      diff: calcDiff(pickAndSumData(pick(allDataSetsNoCalcFilter, 'gardenWaste', 'a'),target), pickAndSumData(pick(allDataSetsNoCalcFilter, 'gardenWaste', 'b'),target))
-    },
-    {
-      id: 'broadband',
-      icon: faWifi,
-      iconColor: '#25db23',
-      primaryText: 'Broadband',
-      secondaryText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'broadband', 'a'),target), target)}kr`,
-      subberText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'broadband', 'b'),target), target)}kr`,
-      diff: calcDiff(pickAndSumData(pick(allDataSetsNoCalcFilter, 'broadband', 'a'),target), pickAndSumData(pick(allDataSetsNoCalcFilter, 'broadband', 'b'),target))
-    },
-    {
-      id: 'security',
-      icon: faShieldAlt,
-      iconColor: '#25db23',
-      primaryText: 'Security alarm',
-      secondaryText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'security', 'a'),target), target)}kr`,
-      subberText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'security', 'b'),target), target)}kr`,
-      diff: calcDiff(pickAndSumData(pick(allDataSetsNoCalcFilter, 'security', 'a'),target), pickAndSumData(pick(allDataSetsNoCalcFilter, 'security', 'b'),target))
-    },
-    {
-      id: 'maintenance',
-      icon: faTools,
-      iconColor: '#ff6868',
-      primaryText: 'Maintenance',
-      secondaryText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'maintenance', 'a'),target), target)}kr`,
-      subberText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'maintenance', 'b'),target), target)}kr`,
-      diff: calcDiff(pickAndSumData(pick(allDataSetsNoCalcFilter, 'maintenance', 'a'),target), pickAndSumData(pick(allDataSetsNoCalcFilter, 'maintenance', 'b'),target))
-    },
-    {
-      id: 'cleaning',
-      icon: faBroom,
-      iconColor: '#ff6868',
-      primaryText: 'House cleaning',
-      secondaryText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'cleaning', 'a'),target), target)}kr`,
-      subberText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'cleaning', 'b'),target), target)}kr`,
-      diff: calcDiff(pickAndSumData(pick(allDataSetsNoCalcFilter, 'cleaning', 'a'),target), pickAndSumData(pick(allDataSetsNoCalcFilter, 'cleaning', 'b'),target))
-    },
-    {
-      id: 'loan',
-      icon: faDollarSign,
-      iconColor: '#5ae3c0',
-      primaryText: 'House loan',
-      secondaryText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'loan', 'a'),target), target)}kr`,
-      subberText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'loan', 'b'),target), target)}kr`,
-      diff: calcDiff(pickAndSumData(pick(allDataSetsNoCalcFilter, 'loan', 'a'),target), pickAndSumData(pick(allDataSetsNoCalcFilter, 'loan', 'b'),target))
-    },
-    {
-      id: 'insurance',
-      icon: faDollarSign,
-      iconColor: '#5ae3c0',
-      primaryText: 'Insurance',
-      secondaryText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'insurance', 'a'),target), target)}kr`,
-      subberText: `${numberWithCommas(pickAndSumData(pick(allDataSetsNoCalcFilter, 'insurance', 'b'),target), target)}kr`,
-      diff: calcDiff(pickAndSumData(pick(allDataSetsNoCalcFilter, 'insurance', 'a'),target), pickAndSumData(pick(allDataSetsNoCalcFilter, 'insurance', 'b'),target))
-    }
-  ]
-  
-  const renderTotalCards = totalCardarray.map(item => {
-   
-    
-    return (
-      <Grid item xs={6} sm={6} md={3}>
-        <TotalCard
-          id={item.id}
-          faIcon={item.icon}
-          iconColor={item.iconColor}
-          diff={item.diff}
-          primaryText={item.primaryText}
-          secondaryText={item.secondaryText}
-          subberText={item.subberText}
-          calcPicker={calcPicker}
-          onClick={calcPickerOnClick}
-        />
-      </Grid>
-    )
-  })
-
-
-
-  
-
   return (
     <Layout title="Settings | Expenses App">
       <Grid container spacing={4}>
@@ -487,7 +255,7 @@ const IndexPage = () => {
             <StyledBox>
               <StyledText variant="body1">{currentYear}</StyledText>
               <h1 style={{marginBottom: 0, marginTop: -5,}}>
-                Variable Costs Overview
+                Variable Usage Overview
               </h1>
             </StyledBox>
           </FlexView>
@@ -501,13 +269,151 @@ const IndexPage = () => {
         </Grid>
         <Grid item xs={12}>
           <GridCon container spacing={4}>
-            {renderTotalCards}
+            <Grid item xs={6} sm={6} md={3}>
+              <TotalCard
+                id={'gas'}
+                faIcon={faBurn}
+                iconColor="warning"
+                primaryText={`Gas`}
+                secondaryText={`${numberWithCommas(pickAndSumData(selectYearData(dataGas, currentYear), 'c'))}${currencyLabel}`}
+                subberText={`${numberWithCommas(pickAndSumData(selectYearData(dataGas, currentYear), 'u'))}Kwh,`}
+                diffText={totalDiffInProgressFromLastYear(dataGas, currentYear)}
+                diffUsage={totalDiffInProgressFromLastYear(dataGas, currentYear, getMonth(),'u')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={6} md={3}>
+              <TotalCard
+                id={'elst'}
+                faIcon={faBolt}
+                iconColor="secondary"
+                primaryText={`Electricty Net`}
+                secondaryText={`${numberWithCommas(pickAndSumData(selectYearData(dataElst, currentYear), 'c'))}${currencyLabel}`}
+                subberText={`${numberWithCommas(pickAndSumData(selectYearData(dataElst, currentYear), 'u'))}Kwh`}
+                diffText={totalDiffInProgressFromLastYear(dataElst, currentYear)}
+                diffUsage={totalDiffInProgressFromLastYear(dataElst, currentYear, getMonth(),'u')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={6} md={3}>
+              <TotalCard
+                id={'eldy'}
+                faIcon={faBolt}
+                iconColor="secondary"
+                primaryText={`Electricty`}
+                secondaryText={`${numberWithCommas(pickAndSumData(selectYearData(dataEldy, currentYear), 'c'))}${currencyLabel}`}
+                subberText={`${numberWithCommas(pickAndSumData(selectYearData(dataEldy, currentYear), 'u'))}Kwh`}
+                diffText={totalDiffInProgressFromLastYear(dataEldy, currentYear)}
+                diffUsage={totalDiffInProgressFromLastYear(dataEldy, currentYear, getMonth(),'u')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={6} md={3}>
+              <TotalCard
+                id={'water'}
+                faIcon={faTint}
+                iconColor="info"
+                primaryText={`Water & Drain`}
+                secondaryText={`${numberWithCommas(pickAndSumData(selectYearData(dataWater, currentYear), 'c'))}${currencyLabel}`}
+                subberText={`${numberWithCommas(pickAndSumData(selectYearData(dataWater, currentYear), 'u'))}m3`}
+                diffText={totalDiffInProgressFromLastYear(dataWater, currentYear)}
+                diffUsage={totalDiffInProgressFromLastYear(dataWater, currentYear, getMonth(),'u')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={6} md={3}>
+              <TotalCard
+                id={'waste'}
+                faIcon={faTrashAlt}
+                iconColor="info"
+                primaryText={`House waste`}
+                secondaryText={`${numberWithCommas(pickAndSumData(selectYearData(dataWaste, currentYear), 'c'))}${currencyLabel}`}
+                subberText={`${numberWithCommas(pickAndSumData(selectYearData(dataWaste, currentYear), 'u'))}kg`}
+                diffText={totalDiffInProgressFromLastYear(dataWaste, currentYear)}
+                diffUsage={totalDiffInProgressFromLastYear(dataWaste, currentYear, getMonth(),'u')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={6} md={3}>
+              <TotalCard
+                id={'broadband'}
+                faIcon={faWifi}
+                iconColor="#25db23"
+                primaryText={`Broadband`}
+                secondaryText={`${numberWithCommas(pickAndSumData(selectYearData(dataBroadband, currentYear), 'c'))}${currencyLabel}`}
+                subberText={`${numberWithCommas(pickAndSumData(selectYearData(dataBroadband, currentYear), 'u'))}st`}
+                diffText={totalDiffInProgressFromLastYear(dataBroadband, currentYear)}
+                diffUsage={totalDiffInProgressFromLastYear(dataBroadband, currentYear, getMonth(),'u')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={6} md={3}>
+              <TotalCard
+                id={'security'}
+                faIcon={faShieldAlt}
+                iconColor="#25db23"
+                primaryText={`Security alarm`}
+                secondaryText={`${numberWithCommas(pickAndSumData(selectYearData(dataSecurity, currentYear), 'c'))}${currencyLabel}`}
+                subberText={`${numberWithCommas(pickAndSumData(selectYearData(dataSecurity, currentYear), 'u'))}st`}
+                diffText={totalDiffInProgressFromLastYear(dataSecurity, currentYear)}
+                diffUsage={totalDiffInProgressFromLastYear(dataSecurity, currentYear, getMonth(),'u')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={6} md={3}>
+              <TotalCard
+                id={'maintenance'}
+                faIcon={faTools}
+                iconColor="#ff6868"
+                primaryText={`Maintenance`}
+                secondaryText={`${numberWithCommas(pickAndSumData(selectYearData(dataMaintenance, currentYear), 'c'))}${currencyLabel}`}
+                subberText={`${numberWithCommas(pickAndSumData(selectYearData(dataMaintenance, currentYear), 'u'))}st`}
+                diffText={totalDiffInProgressFromLastYear(dataMaintenance, currentYear)}
+                diffUsage={totalDiffInProgressFromLastYear(dataMaintenance, currentYear, getMonth(),'u')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={6} md={3}>
+              <TotalCard
+                id={'cleaning'}
+                faIcon={faBroom}
+                iconColor="#ff6868"
+                primaryText={`Cleaning`}
+                secondaryText={`${numberWithCommas(pickAndSumData(selectYearData(cleaningData, currentYear), 'c'))}${currencyLabel}`}
+                subberText={`${numberWithCommas(pickAndSumData(selectYearData(cleaningData, currentYear), 'u'))}st`}
+                diffText={totalDiffInProgressFromLastYear(cleaningData, currentYear)}
+                diffUsage={totalDiffInProgressFromLastYear(cleaningData, currentYear, getMonth(),'u')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={6} md={3}>
+              <TotalCard
+                id={'loan'}
+                faIcon={faDollarSign}
+                iconColor="#5ae3c0"
+                primaryText={`Loan`}
+                secondaryText={`${numberWithCommas(pickAndSumData(selectYearData(dataLoan, currentYear), 'c'))}${currencyLabel}`}
+                subberText={`${numberWithCommas(pickAndSumData(selectYearData(dataLoan, currentYear), 'u'))}st`}
+                diffText={totalDiffInProgressFromLastYear(dataLoan, currentYear)}
+                diffUsage={totalDiffInProgressFromLastYear(dataLoan, currentYear, getMonth(),'u')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={6} md={3}>
+              <TotalCard
+                id={'insurance'}
+                faIcon={faDollarSign}
+                iconColor="#5ae3c0"
+                primaryText={`Insurance`}
+                secondaryText={`${numberWithCommas(pickAndSumData(selectYearData(dataInsurance, currentYear), 'c'))}${currencyLabel}`}
+                subberText={`${numberWithCommas(pickAndSumData(selectYearData(dataInsurance, currentYear), 'u'))}st`}
+                diffText={totalDiffInProgressFromLastYear(dataInsurance, currentYear)}
+                diffUsage={totalDiffInProgressFromLastYear(dataInsurance, currentYear, getMonth(),'u')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={6} md={3}>
+            <TotalCard
+                id={'gardenWaste'}
+                faIcon={faTrashAlt}
+                iconColor="#5ae3c0"
+                primaryText={`Garden waste`}
+                secondaryText={`${numberWithCommas(pickAndSumData(selectYearData(dataGardenWaste, currentYear), 'c'))}${currencyLabel}`}
+                subberText={`${numberWithCommas(pickAndSumData(selectYearData(dataGardenWaste, currentYear), 'u'))}kg`}
+                diffText={totalDiffInProgressFromLastYear(dataGardenWaste, currentYear)}
+                diffUsage={totalDiffInProgressFromLastYear(dataGardenWaste, currentYear, getMonth(),'u')}
+              />
+            </Grid>
           </GridCon>
-        </Grid>
-        <Grid item xs={12} sm={12} md={12}>
-          <FlexView style={{flexDirection: 'row'}}>
-            <TotalTotalCard arrayBothYears={totalYearAYearB} />
-          </FlexView>
         </Grid>
 
         <Grid item xs={12} sm={12} md={7}>
